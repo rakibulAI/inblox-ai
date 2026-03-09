@@ -1,23 +1,24 @@
-{
+
+  {
   "name": "Inblox AI",
   "short_name": "Inblox",
   "description": "Craft perfect emails in seconds with AI",
-  "start_url": "/inblox-ai/",
+  "start_url": "./",
+  "scope": "/inblox-ai/",
   "display": "standalone",
   "background_color": "#fce4ff",
   "theme_color": "#9B6FE8",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://rakibulai.github.io/inblox-ai/inblox-ai-logo.png"
+      "src": "./inblox-ai-logo.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://rakibulai.github.io/inblox-ai/inblox-ai-logo.png"
-  
-       "sizes": "512x512",
+      "src": "./inblox-ai-logo.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
-}
+  }
