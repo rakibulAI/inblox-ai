@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Inblox AI — Premium Email Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --glass-bg:rgba(255,255,255,0.22);
+  --glass-border:rgba(255,255,255,0.45);
+  --glass-shadow:rgba(168,130,255,0.18);
+  --blur:blur(22px);
+  --text-primary:#2D1B69;
+  --text-secondary:#6B5B9E;
+  --accent:#9B6FE8;
+  --radius-lg:28px;
+  --radius-md:18px;
+  --radius-sm:12px;
+  --ease:.32s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  background:linear-gradient(135deg,#fce4ff 0%,#e8d5ff 18%,#d0e8ff 38%,#c8f7e8 58%,#ffe8d6 78%,#ffd6eb 100%);
+  background-size:400% 400%;
+  animation:bgShift 14s ease-in-out infinite;
+  overflow-x:hidden;
+  color:var(--text-primary);
+}
+@keyframes bgShift{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+
+/* ORBS */
+.orb{position:fixed;border-radius:50%;filter:blur(60px);opacity:.5;pointer-events:none;z-index:0;}
+.orb1{width:420px;height:420px;background:radial-gradient(circle,#f9a8ff,#c084fc);top:-120px;left:-100px;animation:orbFloat 10s ease-in-out infinite;}
+.orb2{width:340px;height:340px;background:radial-gradient(circle,#a8d8ff,#60b8ff);top:35%;right:-80px;animation:orbFloat 12s ease-in-out infinite;animation-delay:-3s;}
+.orb3{width:260px;height:260px;background:radial-gradient(circle,#a8ffd6,#34d399);bottom:8%;left:8%;animation:orbFloat 9s ease-in-out infinite;animation-delay:-6s;}
+.orb4{width:200px;height:200px;background:radial-gradient(circle,#ffd6b3,#fb923c);bottom:22%;right:18%;animation:orbFloat 11s ease-in-out infinite;animation-delay:-9s;}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-38px) scale(1.07);}}
+
+/* PARTICLES */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.particle{position:absolute;border-radius:50%;background:rgba(255,255,255,0.75);animation:particleDrift linear infinite;}
+@keyframes particleDrift{
+  0%  {transform:translateY(110vh) rotate(0deg);opacity:0;}
+  8%  {opacity:.8;}
+  92% {opacity:.4;}
+  100%{transform:translateY(-80px) rotate(720deg);opacity:0;}
+}
+
+/* GLASS */
+.glass{
+  background:var(--glass-bg);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+  border:1.5px solid var(--glass-border);
+  box-shadow:0 8px 40px var(--glass-shadow),inset 0 1px 0 rgba(255,255,255,0.55);
+}
+
+/* ── NAVBAR ── */
+nav{
+  position:fixed;top:14px;left:50%;
+  transform:translateX(-50%);
+  width:calc(100% - 28px);
+  max-width:1100px;
+  z-index:100;
+  border-radius:var(--radius-lg);
+  padding:12px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  transition:var(--ease);
+}
+nav.scrolled{box-shadow:0 12px 48px rgba(155,111,232,0.22);}
+
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:1.15rem;
+  color:var(--text-primary);text-decoration:none;flex-shrink:0;
+}
+.nav-logo .logo-icon{
+  width:34px;height:34px;
+  background:linear-gradient(135deg,#c084fc,#60a5fa);
+  border-radius:10px;display:grid;place-items:center;font-size:.95rem;
+  box-shadow:0 4px 14px rgba(192,132,252,0.38);flex-shrink:0;
+}
+
+/* Desktop links */
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-links a{
+  text-decoration:none;color:var(--text-secondary);
+  font-size:.82rem;font-weight:500;
+  padding:7px 14px;border-radius:30px;transition:var(--ease);white-space:nowrap;
+}
+.nav-links a:hover{background:rgba(155,111,232,0.12);color:var(--accent);transform:translateY(-1px);}
+.nav-cta{
+  background:linear-gradient(135deg,#c084fc,#818cf8)!important;
+  color:#fff!important;
+  box-shadow:0 4px 16px rgba(192,132,252,0.35)!important;
+}
+.nav-cta:hover{box-shadow:0 6px 24px rgba(192,132,252,0.5)!important;transform:translateY(-2px)!important;}
+
+/* Hamburger — hidden on desktop */
+.hamburger{
+  display:none;flex-direction:column;gap:5px;cursor:pointer;
+  padding:6px;border-radius:10px;border:none;background:rgba(255,255,255,0.3);
+  backdrop-filter:blur(8px);transition:var(--ease);
+}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text-primary);border-radius:4px;transition:var(--ease);}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* Mobile dropdown */
+.nav-mobile{
+  display:none;position:fixed;
+  top:74px;left:14px;right:14px;
+  border-radius:var(--radius-md);
+  padding:16px;
+  flex-direction:column;gap:6px;
+  z-index:99;
+  animation:fadeDown .25s ease both;
+}
+.nav-mobile.show{display:flex;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.nav-mobile a{
+  text-decoration:none;color:var(--text-primary);font-weight:600;
+  font-size:.9rem;padding:12px 16px;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,0.25);transition:var(--ease);
+}
+.nav-mobile a:hover{background:rgba(155,111,232,0.15);}
+.nav-mobile .mob-cta{
+  background:linear-gradient(135deg,#c084fc,#818cf8)!important;
+  color:#fff!important;text-align:center;
+  box-shadow:0 4px 16px rgba(192,132,252,0.3);
+}
+
+@media(max-width:640px){
+  .nav-links{display:none;}
+  .hamburger{display:flex;}
+}
+
+/* PAGE */
+.page{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:110px 16px 60px;}
+
+/* HERO */
+.hero{text-align:center;margin-bottom:48px;animation:fadeUp .8s .1s both;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--accent);padding:7px 16px;border-radius:30px;margin-bottom:20px;
+  border:1.5px solid rgba(155,111,232,0.3);background:rgba(155,111,232,0.08);
+}
+.hero h1{
+  font-family:'Poppins',sans-serif;
+  font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.18;
+  color:var(--text-primary);text-shadow:0 2px 24px rgba(155,111,232,0.18);margin-bottom:14px;
+}
+.hero h1 span{
+  background:linear-gradient(135deg,#c084fc,#60a5fa,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero p{font-size:1rem;color:var(--text-secondary);max-width:500px;margin:0 auto;line-height:1.75;font-weight:400;}
+
+/* GRID */
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:700px){.main-grid{grid-template-columns:1fr;}}
+
+/* CARD */
+.card{
+  border-radius:var(--radius-lg);padding:26px;
+  transition:var(--ease);position:relative;overflow:hidden;
+  animation:fadeUp .8s .25s both;
+}
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(135deg,rgba(255,255,255,0.32) 0%,rgba(255,255,255,0) 60%);
+  pointer-events:none;
+}
+.card:hover{transform:translateY(-5px);box-shadow:0 22px 60px rgba(155,111,232,0.2),inset 0 1px 0 rgba(255,255,255,0.7);}
+
+.card-header{display:flex;align-items:center;gap:11px;margin-bottom:20px;}
+.card-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:1rem;flex-shrink:0;}
+.icon-purple{background:linear-gradient(135deg,#e9d5ff,#c084fc);box-shadow:0 4px 14px rgba(192,132,252,0.28);}
+.icon-blue  {background:linear-gradient(135deg,#dbeafe,#60a5fa);box-shadow:0 4px 14px rgba(96,165,250,0.28);}
+.icon-green {background:linear-gradient(135deg,#d1fae5,#34d399);box-shadow:0 4px 14px rgba(52,211,153,0.28);}
+.card-title{font-size:.95rem;font-weight:700;color:var(--text-primary);}
+.card-subtitle{font-size:.75rem;color:var(--text-secondary);margin-top:2px;}
+
+.label{font-size:.75rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+
+/* TEXTAREA / INPUT */
+.glass-input{
+  width:100%;
+  background:rgba(255,255,255,0.35);
+  border:1.5px solid rgba(255,255,255,0.55);
+  border-radius:var(--radius-md);
+  padding:13px 15px;
+  font-family:'Inter',sans-serif;font-size:.88rem;
+  color:var(--text-primary);
+  resize:none;transition:var(--ease);outline:none;
+  box-shadow:inset 0 2px 8px rgba(155,111,232,0.05);
+}
+.glass-input::placeholder{color:rgba(107,91,158,0.42);}
+.glass-input:focus{
+  border-color:rgba(155,111,232,0.5);
+  background:rgba(255,255,255,0.48);
+  box-shadow:0 0 0 3px rgba(155,111,232,0.12),inset 0 2px 8px rgba(155,111,232,0.05);
+}
+.char-count{text-align:right;font-size:.68rem;color:var(--text-secondary);margin-top:4px;}
+
+/* TONE GRID */
+.tone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px;}
+.tone-btn{
+  background:rgba(255,255,255,0.28);
+  border:1.5px solid rgba(255,255,255,0.48);
+  border-radius:var(--radius-sm);
+  padding:12px 6px 10px;
+  cursor:pointer;transition:var(--ease);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  position:relative;overflow:hidden;
+}
+.tone-btn::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at center,rgba(255,255,255,0.55),transparent 70%);
+  opacity:0;transition:opacity .3s;
+}
+.tone-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(155,111,232,0.15);}
+.tone-btn:hover::after{opacity:1;}
+.tone-btn.active{
+  background:linear-gradient(135deg,rgba(192,132,252,0.2),rgba(96,165,250,0.2));
+  border-color:rgba(155,111,232,0.48);
+  box-shadow:0 4px 18px rgba(155,111,232,0.18);
+}
+.tone-emoji{font-size:1.3rem;line-height:1;}
+.tone-name{font-size:.72rem;font-weight:700;color:var(--text-primary);}
+.tone-desc{font-size:.62rem;color:var(--text-secondary);text-align:center;line-height:1.3;}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.toggle-switch{position:relative;width:42px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-track{
+  position:absolute;inset:0;background:rgba(155,111,232,0.2);
+  border-radius:30px;transition:var(--ease);border:1.5px solid rgba(155,111,232,0.25);cursor:pointer;
+}
+.toggle-thumb{
+  position:absolute;left:3px;top:3px;width:16px;height:16px;
+  background:#fff;border-radius:50%;transition:var(--ease);
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);pointer-events:none;
+}
+.toggle-switch input:checked ~ .toggle-track{background:linear-gradient(135deg,#c084fc,#60a5fa);}
+.toggle-switch input:checked ~ .toggle-thumb{left:21px;}
+
+/* GENERATE BTN */
+.btn-generate{
+  width:100%;
+  background:linear-gradient(135deg,#c084fc 0%,#818cf8 50%,#60a5fa 100%);
+  border:none;border-radius:var(--radius-md);
+  padding:15px 22px;color:#fff;
+  font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;
+  cursor:pointer;letter-spacing:.02em;
+  position:relative;overflow:hidden;transition:var(--ease);
+  box-shadow:0 8px 26px rgba(192,132,252,0.38);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+}
+.btn-generate::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.2),rgba(255,255,255,0));pointer-events:none;}
+.btn-generate:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 14px 38px rgba(192,132,252,0.52);}
+.btn-generate:active:not(:disabled){transform:translateY(0);}
+.btn-generate:disabled{opacity:.5;cursor:not-allowed;}
+
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.35);transform:scale(0);animation:rippleAnim .6s linear;pointer-events:none;}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0;}}
+
+/* OUTPUT */
+.output-card{grid-column:1/-1;animation:fadeUp .8s .4s both;}
+.output-inner{
+  min-height:150px;background:rgba(255,255,255,0.28);
+  border-radius:var(--radius-md);border:1.5px solid rgba(255,255,255,0.5);
+  padding:20px;position:relative;transition:var(--ease);
+  box-shadow:inset 0 2px 10px rgba(155,111,232,0.04);
+}
+.output-inner.has-content{box-shadow:0 8px 30px rgba(155,111,232,0.12),inset 0 2px 10px rgba(155,111,232,0.04);}
+.output-text{font-size:.9rem;line-height:1.82;color:var(--text-primary);white-space:pre-wrap;word-break:break-word;}
+.output-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:130px;gap:11px;opacity:.55;}
+.output-placeholder .big-icon{font-size:2.6rem;animation:pulse 2.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.output-placeholder p{font-size:.82rem;color:var(--text-secondary);text-align:center;max-width:220px;line-height:1.6;}
+
+.action-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.btn-action{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 16px;border-radius:30px;
+  border:1.5px solid rgba(255,255,255,0.55);
+  background:rgba(255,255,255,0.35);
+  color:var(--text-primary);font-family:'Inter',sans-serif;
+  font-size:.78rem;font-weight:600;cursor:pointer;transition:var(--ease);
+  backdrop-filter:blur(8px);
+}
+.btn-action:hover{background:rgba(255,255,255,0.55);transform:translateY(-2px);box-shadow:0 6px 18px rgba(155,111,232,0.14);}
+.btn-action.copied{background:linear-gradient(135deg,rgba(52,211,153,0.22),rgba(16,185,129,0.14));border-color:rgba(52,211,153,0.45);color:#059669;}
+
+/* TIPS */
+.tips-strip{
+  grid-column:1/-1;border-radius:var(--radius-md);
+  padding:16px 22px;display:flex;gap:20px;flex-wrap:wrap;
+  animation:fadeUp .8s .55s both;
+}
+.tip-item{display:flex;align-items:center;gap:8px;font-size:.77rem;color:var(--text-secondary);font-weight:500;}
+.tip-dot{width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,#c084fc,#60a5fa);flex-shrink:0;}
+
+/* SPINNER */
+.spinner-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;min-height:130px;}
+.spinner{width:42px;height:42px;border-radius:50%;border:3px solid rgba(155,111,232,0.16);border-top-color:#c084fc;border-right-color:#60a5fa;animation:spin .85s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spinner-text{font-size:.82rem;color:var(--text-secondary);font-weight:500;animation:shimmer 1.5s ease-in-out infinite;}
+@keyframes shimmer{0%,100%{opacity:.6;}50%{opacity:1;}}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
+
+.scroll-hint{text-align:center;margin-top:14px;font-size:.7rem;color:rgba(107,91,158,0.4);animation:fadeUp .8s .7s both;}
+
+/* Subject toggle pair */
+.sub-pair{display:flex;gap:8px;}
+.sub-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:10px 6px;border-radius:var(--radius-sm);border:1.5px solid rgba(255,255,255,0.48);
+  background:rgba(255,255,255,0.28);cursor:pointer;transition:var(--ease);font-family:'Inter',sans-serif;
+}
+.sub-btn.active{background:linear-gradient(135deg,rgba(192,132,252,0.2),rgba(96,165,250,0.2));border-color:rgba(155,111,232,0.45);}
+.sub-btn:hover{transform:translateY(-2px);}
+.sub-btn span:first-child{font-size:1.1rem;}
+.sub-btn span:last-child{font-size:.7rem;font-weight:700;color:var(--text-primary);}
+</style>
+</head>
+<body>
+
+<!-- Orbs -->
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+<div class="orb orb4"></div>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- NAVBAR -->
+<nav class="glass" id="navbar">
+  <a class="nav-logo" href="#">
+    <div class="logo-icon">📨</div>
+    Inblox <span style="color:var(--accent);margin-left:2px;">AI</span>
+  </a>
+  <div class="nav-links">
+    <a href="#">Features</a>
+    <a href="#">Templates</a>
+    <a href="#" class="nav-cta">Try Free ✦</a>
+  </div>
+  <!-- Hamburger (mobile) -->
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile nav dropdown -->
+<div class="nav-mobile glass" id="mobileMenu">
+  <a href="#">✦ Features</a>
+  <a href="#">📋 Templates</a>
+  <a href="#" class="mob-cta">Try Free ✦</a>
+</div>
+
+<!-- PAGE -->
+<main class="page">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">✦ Powered by AI · Built for Humans</div>
+    <h1>Craft <span>Perfect Emails</span><br>In Seconds</h1>
+    <p>Turn raw thoughts into polished, professional emails instantly. Choose your tone, add context, and let AI do the magic.</p>
+  </section>
+
+  <!-- GRID -->
+  <div class="main-grid">
+
+    <!-- Card 1: Thoughts + Tone -->
+    <div class="card glass">
+      <div class="card-header">
+        <div class="card-icon icon-purple">💭</div>
+        <div>
+          <div class="card-title">Your Thoughts</div>
+          <div class="card-subtitle">Write freely — grammar doesn't matter</div>
+        </div>
+      </div>
+
+      <div class="label">✏️ What do you want to say?</div>
+      <textarea id="rawThoughts" class="glass-input" rows="6"
+        placeholder="e.g. tell john we can't make friday deadline, need 3 more days, backend broken, want to apologize but stay professional…"
+        oninput="onThoughtsInput()"></textarea>
+      <div class="char-count" id="count1">0 / 800</div>
+
+      <div style="margin-top:20px;">
+        <div class="label">🎨 Email Tone</div>
+        <div class="tone-grid" id="toneGrid">
+          <button class="tone-btn active" data-tone="professional" onclick="selectTone(this)">
+            <span class="tone-emoji">💼</span>
+            <span class="tone-name">Professional</span>
+            <span class="tone-desc">Clear & business</span>
+          </button>
+          <button class="tone-btn" data-tone="warm" onclick="selectTone(this)">
+            <span class="tone-emoji">🌸</span>
+            <span class="tone-name">Warm</span>
+            <span class="tone-desc">Friendly & kind</span>
+          </button>
+          <button class="tone-btn" data-tone="concise" onclick="selectTone(this)">
+            <span class="tone-emoji">⚡</span>
+            <span class="tone-name">Concise</span>
+            <span class="tone-desc">Brief & sharp</span>
+          </button>
+          <button class="tone-btn" data-tone="formal" onclick="selectTone(this)">
+            <span class="tone-emoji">🏛️</span>
+            <span class="tone-name">Formal</span>
+            <span class="tone-desc">Traditional</span>
+          </button>
+          <button class="tone-btn" data-tone="casual" onclick="selectTone(this)">
+            <span class="tone-emoji">😊</span>
+            <span class="tone-name">Casual</span>
+            <span class="tone-desc">Relaxed & easy</span>
+          </button>
+          <button class="tone-btn" data-tone="persuasive" onclick="selectTone(this)">
+            <span class="tone-emoji">🚀</span>
+            <span class="tone-name">Persuasive</span>
+            <span class="tone-desc">Compelling</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Options + Generate -->
+    <div class="card glass" style="display:flex;flex-direction:column;gap:18px;">
+
+      <!-- Reply Context toggle -->
+      <div>
+        <div class="toggle-row">
+          <div>
+            <div class="card-title" style="font-size:.9rem;">📩 Reply Context</div>
+            <div class="card-subtitle">Paste email you're replying to</div>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="ctxToggle" onchange="toggleCtx()">
+            <div class="toggle-track" onclick="document.getElementById('ctxToggle').click()"></div>
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
+        <div id="ctxArea" style="display:none;">
+          <textarea id="contextEmail" class="glass-input" rows="4"
+            placeholder="Paste the original email here…"
+            oninput="clampCount(this,'count2',600)"></textarea>
+          <div class="char-count" id="count2">0 / 600</div>
+        </div>
+      </div>
+
+      <!-- Recipient -->
+
+    <!-- Recipient -->
+      <div>
+        <div class="label">👤 Recipient (optional)</div>
+        <input id="recipient" type="text" class="glass-input"
+          style="height:auto;padding:11px 14px;resize:none;"
+          placeholder="e.g. My boss John, a client, a friend…"/>
+      </div>
+
+      <!-- Subject line -->
+      <div>
+        <div class="label">📌 Include subject line?</div>
+        <div class="sub-pair">
+          <button class="sub-btn active" id="subYes" onclick="setSubject(true)">
+            <span>✅</span><span>Yes</span>
+          </button>
+          <button class="sub-btn" id="subNo" onclick="setSubject(false)">
+            <span>❌</span><span>No</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Generate -->
+      <button class="btn-generate" id="genBtn" onclick="generateEmail(event)" disabled>
+        <span id="btnIcon">✨</span>
+        <span id="btnText">Write My Email</span>
+      </button>
+
+      <div style="text-align:center;font-size:.7rem;color:var(--text-secondary);">
+        ⌨️ <kbd style="background:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.6);border-radius:5px;padding:1px 6px;">⌘ Enter</kbd> to generate
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div class="card glass output-card">
+      <div class="card-header" style="justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;align-items:center;gap:11px;">
+          <div class="card-icon icon-green">📧</div>
+          <div>
+            <div class="card-title">Generated Email</div>
+            <div class="card-subtitle" id="outSubtitle">Your polished email will appear here</div>
+          </div>
+        </div>
+        <div class="action-row" id="actionRow" style="margin-top:0;display:none;">
+          <button class="btn-action" id="copyBtn" onclick="copyEmail()">📋 Copy</button>
+          <button class="btn-action" onclick="doRegenerate()">🔄 Regenerate</button>
+          <button class="btn-action" onclick="clearAll()">🗑️ Clear</button>
+        </div>
+      </div>
+      <div class="output-inner" id="outInner">
+        <div class="output-placeholder" id="outPlaceholder">
+          <div class="big-icon">✉️</div>
+          <p>Your beautifully crafted email will appear here — ready to send.</p>
+        </div>
+        <div id="outContent" style="display:none;">
+          <div class="output-text" id="outText"></div>
+        </div>
+        <div id="loadingArea" style="display:none;">
+          <div class="spinner-wrap">
+            <div class="spinner"></div>
+            <div class="spinner-text" id="spinnerTxt">Crafting your perfect email…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="tips-strip glass">
+      <div class="tip-item"><div class="tip-dot"></div>Be specific about your goal</div>
+      <div class="tip-item"><div class="tip-dot"></div>Include key details in rough form</div>
+      <div class="tip-item"><div class="tip-dot"></div>Try different tones for best fit</div>
+      <div class="tip-item"><div class="tip-dot"></div>Add context for smarter replies</div>
+      <div class="tip-item"><div class="tip-dot"></div>Regenerate for fresh variations</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">Inblox AI — Beautifully crafted emails, instantly.</div>
+</main>
+
+<script>
+/* ── PARTICLES ── */
+(()=>{
+  const c=document.getElementById('particles');
+  for(let i=0;i<24;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const s=Math.random()*5+2;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*18+12}s;animation-delay:${Math.random()*14}s;opacity:${Math.random()*.5+.2};`;
+    c.appendChild(p);
+  }
+})();
+
+/* ── NAVBAR SCROLL ── */
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',scrollY>20);
+});
+
+/* ── HAMBURGER ── */
+function toggleMenu(){
+  const h=document.getElementById('hamburger');
+  const m=document.getElementById('mobileMenu');
+  h.classList.toggle('open');
+  m.classList.toggle('show');
+}
+document.addEventListener('click',e=>{
+  const h=document.getElementById('hamburger');
+  const m=document.getElementById('mobileMenu');
+  if(!h.contains(e.target)&&!m.contains(e.target)){
+    h.classList.remove('open');
+    m.classList.remove('show');
+  }
+});
+
+/* ── STATE ── */
+let tone='professional', inclSubject=true, loading=false, lastResult='';
+
+/* ── TONE ── */
+function selectTone(btn){
+  document.querySelectorAll('.tone-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  tone=btn.dataset.tone;
+}
+
+/* ── SUBJECT ── */
+function setSubject(v){
+  inclSubject=v;
+  document.getElementById('subYes').classList.toggle('active',v);
+  document.getElementById('subNo').classList.toggle('active',!v);
+}
+
+/* ── CONTEXT ── */
+function toggleCtx(){
+  const on=document.getElementById('ctxToggle').checked;
+  const a=document.getElementById('ctxArea');
+  a.style.display=on?'block':'none';
+  if(on){a.style.animation='fadeUp .3s both';}
+}
+
+/* ── CHAR COUNT ── */
+function clampCount(el,id,max){
+  el.value=el.value.slice(0,max);
+  document.getElementById(id).textContent=`${el.value.length} / ${max}`;
+}
+function onThoughtsInput(){
+  clampCount(document.getElementById('rawThoughts'),'count1',800);
+  checkReady();
+}
+function checkReady(){
+  const v=document.getElementById('rawThoughts').value.trim();
+  document.getElementById('genBtn').disabled=v.length<3||loading;
+}
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='Enter') generateEmail(e);
+});
+
+/* ── RIPPLE ── */
+function addRipple(btn,e){
+  const r=document.createElement('span');
+  r.className='ripple';
+  const rect=btn.getBoundingClientRect();
+  const sz=Math.max(rect.width,rect.height);
+  r.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-rect.left-sz/2}px;top:${e.clientY-rect.top-sz/2}px;`;
+  btn.appendChild(r);
+  setTimeout(()=>r.remove(),700);
+}
+
+/* ── SPINNER ── */
+const msgs=['Crafting your perfect email…','Polishing the tone…','Adding a professional touch…','Almost ready…'];
+let sIdx=0,sInt;
+function startSpinner(){sIdx=0;document.getElementById('spinnerTxt').textContent=msgs[0];sInt=setInterval(()=>{sIdx=(sIdx+1)%msgs.length;document.getElementById('spinnerTxt').textContent=msgs[sIdx];},1600);}
+function stopSpinner(){clearInterval(sInt);}
+
+/* ── TYPEWRITER ── */
+function typeWriter(text,el){
+  el.textContent='';let i=0;
+  const t=setInterval(()=>{el.textContent+=text[i++];if(i>=text.length)clearInterval(t);},9);
+}
+
+/* ── GENERATE ── */
+async function generateEmail(e){
+  if(loading)return;
+  const thoughts=document.getElementById('rawThoughts').value.trim();
+  if(thoughts.length<3)return;
+  if(e&&e.currentTarget)addRipple(e.currentTarget,e);
+
+  loading=true;checkReady();
+  document.getElementById('btnIcon').textContent='⏳';
+  document.getElementById('btnText').textContent='Crafting…';
+  document.getElementById('outPlaceholder').style.display='none';
+  document.getElementById('outContent').style.display='none';
+  document.getElementById('loadingArea').style.display='block';
+  document.getElementById('actionRow').style.display='none';
+  document.getElementById('outInner').classList.remove('has-content');
+  startSpinner();
+
+  const ctx=document.getElementById('contextEmail').value.trim();
+  const rec=document.getElementById('recipient').value.trim();
+
+  const prompt=`You are an expert email writer for Inblox AI. Transform the following raw thoughts into a beautifully crafted email.
+
+Raw thoughts: "${thoughts}"
+${rec?`Recipient: ${rec}`:''}
+${ctx?`\nContext – email I am replying to:\n"${ctx}"`:''}
+Tone: ${tone}
+${inclSubject?'Include a Subject line at the very top formatted as "Subject: …"':'Do NOT include a subject line.'}
+
+Rules:
+- Complete, ready-to-send email
+- ${tone} tone throughout
+- Proper opening and closing
+- Clear paragraph structure
+- Output ONLY the email text, no meta-commentary`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const txt=data.content?.map(b=>b.text||'').join('\n').trim()||'Could not generate. Please try again.';
+    lastResult=txt;showResult(txt);
+  }catch(err){showResult('⚠️ Network error. Please check your connection and try again.');}
+}
+
+function showResult(txt){
+  stopSpinner();
+  document.getElementById('loadingArea').style.display='none';
+  document.getElementById('outContent').style.display='block';
+  document.getElementById('outInner').classList.add('has-content');
+  document.getElementById('actionRow').style.display='flex';
+  document.getElementById('outSubtitle').textContent='Ready to send ✓';
+  typeWriter(txt,document.getElementById('outText'));
+  loading=false;
+  document.getElementById('btnIcon').textContent='✨';
+  document.getElementById('btnText').textContent='Write My Email';
+  checkReady();
+  document.getElementById('outInner').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ── COPY ── */
+async function copyEmail(){
+  if(!lastResult)return;
+  try{
+    await navigator.clipboard.writeText(lastResult);
+    const b=document.getElementById('copyBtn');
+    b.textContent='✅ Copied!';b.classList.add('copied');
+    setTimeout(()=>{b.textContent='📋 Copy';b.classList.remove('copied');},2200);
+  }catch(_){alert('Please select and copy manually.');}
+}
+
+/* ── REGEN ── */
+function doRegenerate(){generateEmail({currentTarget:document.getElementById('genBtn'),clientX:0,clientY:0});}
+
+/* ── CLEAR ── */
+function clearAll(){
+  document.getElementById('rawThoughts').value='';
+  document.getElementById('contextEmail').value='';
+  document.getElementById('recipient').value='';
+  document.getElementById('count1').textContent='0 / 800';
+  document.getElementById('count2').textContent='0 / 600';
+  document.getElementById('outPlaceholder').style.display='flex';
+  document.getElementById('outContent').style.display='none';
+  document.getElementById('actionRow').style.display='none';
+  document.getElementById('outSubtitle').textContent='Your polished email will appear here';
+  document.getElementById('outInner').classList.remove('has-content');
+  lastResult='';checkReady();
+}
+</script>
+</body>
+</html>
+
+
+          
