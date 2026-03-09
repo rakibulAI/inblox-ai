@@ -9,7 +9,7 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192x192/9B6FE8/ffffff?text=IA",
+      "src": "inblox-ai-logo.png"
       "sizes": "192x192",
       "type": "image/png"
     },
